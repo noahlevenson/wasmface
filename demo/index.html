@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+	<title>wasmface demo</title>
+
+	<link rel="stylesheet" type="text/css" href="styles.css">
+
+</head>
+
+<body>
+
+	<h1>are these faces?</h1>
+
+	<img id="wildcard" src="noah_240.jpg">
+	<img id="jenniferlopez" src="Jennifer_Lopez_0003.jpg">
+	<img id="lancebass" src="Lance_Bass_0001.jpg">
+	<img id="noahlevenson" src="noah.jpg">
+	<img id="pikachu" src="pikachu_surprise.jpg">
+	<img id="robocop" src="robocop.jpg">
+	<img id="pizza" src="pizza.jpg">
+	<img id="richardstallman" src="Richard_Stallman.jpg">
+
+	<div class="container">
+		<span class="copy">???</span>
+		<canvas class="canvas-24" id="wildcard-canvas"></canvas>
+		<span class="result" id="wildcard-result"></span>
+		<span>
+	</div>
+
+	<div class="container">
+		<span class="copy">Jennifer Lopez</span>
+		<canvas class="canvas-24" id="jenniferlopez-canvas"></canvas>
+		<span class="result" id="jenniferlopez-result"></span>
+		<span>
+	</div>
+
+	<div class="container">
+		<span class="copy">Lance Bass</span>
+		<canvas class="canvas-24" id="lancebass-canvas"></canvas>
+		<span class="result" id="lancebass-result"></span>
+	</div>
+
+	<div class="container">
+		<span class="copy">Noah Levenson</span>
+		<canvas class="canvas-24" id="noahlevenson-canvas"></canvas>
+		<span class="result" id="noahlevenson-result"></span>
+	</div>
+
+	<div class="container">
+		<span class="copy">Pikachu</span>
+		<canvas class="canvas-24" id="pikachu-canvas"></canvas>
+		<span class="result" id="pikachu-result"></span>
+	</div>
+
+	<div class="container">
+		<span class="copy">Robocop</span>
+		<canvas class="canvas-24" id="robocop-canvas"></canvas>
+		<span class="result" id=robocop-result></span>
+	</div>
+
+	<div class="container">
+		<span class="copy">Pizza</span>
+		<canvas class="canvas-24" id="pizza-canvas"></canvas>
+		<span class="result" id=pizza-result></span>
+	</div>
+
+	<div class="container">
+		<span class="copy">Richard Stallman</span>
+		<canvas class="canvas-24" id="richardstallman-canvas"></canvas>
+		<span class="result" id="richardstallman-result"></span>
+	</div>
+
+	<br> 
+
+	<button type="button" id="detect" onclick="go()">detect!</button>
+
+	<script src="wasmface.js"></script>
+
+	<script src="demo.js"></script>
+
+</body>
+
+
+</html>
