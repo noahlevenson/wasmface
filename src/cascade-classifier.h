@@ -16,7 +16,7 @@ class CascadeClassifier {
 		void scale(float factor);
 		void add(StrongClassifier sc);
 		void removeLast();
-		bool classify(IntegralImage integral, int sx, int sy, float mean, float sd);
+		bool classify(IntegralImage& integral, int sx, int sy, float mean, float sd);
 		float getFPR(std::vector<IntegralImage>& negativeValidationSet);
 		float getFNR(std::vector<IntegralImage>& positiveValidationSet);
 		int baseResolution;

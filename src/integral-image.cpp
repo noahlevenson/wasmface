@@ -59,7 +59,7 @@ float IntegralImage::getRectangleSum(int x, int y, int w, int h) {
 // type 3: 2 rectangles vertically
 // type 4: 3 rectangles vertically
 // type 5: 4 rectangles in a 2x2 grid
-float IntegralImage::computeFeature(Haarlike h, int sx, int sy) {
+float IntegralImage::computeFeature(Haarlike& h, int sx, int sy) {
 	float wSum, bSum;
 	if (h.type == 1) {
 		wSum = this->getRectangleSum(h.x + sx, h.y + sy, h.w, h.h);

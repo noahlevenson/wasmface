@@ -31,7 +31,7 @@ void StrongClassifier::add(WeakClassifier weakClassifier, float weight) {
 
 // TODO: Why do we take arguments for subwindow size and subwindow offsets? Why doesn't this
 // match the arity of WeakClassifier::classify ? Is it for future frontend implementation and scaling etc?
-bool StrongClassifier::classify(IntegralImage integral, int sx, int sy, float mean, float sd) {
+bool StrongClassifier::classify(IntegralImage& integral, int sx, int sy, float mean, float sd) {
 	float score = 0;
 	for (int i = 0; i < this->weakClassifiers.size(); i += 1) {
 		auto f = integral.computeFeature(this->weakClassifiers[i].haarlike, sx, sy);
@@ -47,8 +47,9 @@ bool StrongClassifier::classify(IntegralImage integral, int sx, int sy, float me
 
 		if (sd != 0) f /= sd;
 
+		// std::cout << "normalized f val: " << f << std::endl;
 		// TODO: should we make weak classifier::classify return a float?
-		score += float(this->weakClassifiers[i].classify(f)) * float(this->weights[i]);
+		score += this->weakClassifiers[i].classify(f) * this->weights[i];
 	}
 
 	if (score >= this->threshold) {

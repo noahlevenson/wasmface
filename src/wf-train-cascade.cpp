@@ -1,6 +1,6 @@
-// g++ wf-train-cascade.cpp utility.cpp integral-image.cpp haar-like.cpp weak-classifier.cpp strong-classifier.cpp cascade-classifier.cpp -O3 -L/usr/X11R6/lib -lm -lpthread -lX11 -std=c++17 "-lstdc++fs" -o ../bin/tc
+// g++ wf-train-cascade.cpp utility.cpp integral-image.cpp haar-like.cpp weak-classifier.cpp strong-classifier.cpp cascade-classifier.cpp -O3 -L/usr/X11R6/lib -lm -lpthread -lX11 -std=c++17 "-lstdc++fs" -o ../bin/wf-train-cascade
 
-// g++ -g wf-train-cascade.cpp utility.cpp integral-image.cpp haar-like.cpp weak-classifier.cpp strong-classifier.cpp cascade-classifier.cpp -O0 -L/usr/X11R6/lib -lm -lpthread -lX11 -std=c++17 "-lstdc++fs" -o ../bin/tc
+// g++ -g wf-train-cascade.cpp utility.cpp integral-image.cpp haar-like.cpp weak-classifier.cpp strong-classifier.cpp cascade-classifier.cpp -O0 -L/usr/X11R6/lib -lm -lpthread -lX11 -std=c++17 "-lstdc++fs" -o ../bin/wf-train-cascade
 
 #include <iostream>
 #include <vector>
@@ -27,7 +27,7 @@ void collectLocalExamples(const std::experimental::filesystem::path& path, std::
 			collectLocalExamples(childPath.path(), destination);
 		}	
 	} else {
-		if (path.extension() == ".jpg" || path.extension() == ".JPG") {
+		if (path.extension() == ".jpg" || path.extension() == ".JPG" || path.extension() == ".ppm") {
 			std::cout << "\nFound file --> " << path.string() << std::endl;
 				destination.push_back(path.string());	
 		}
@@ -54,9 +54,8 @@ void computeAllIntegrals(
 		cimg_library::CImg<unsigned char> image(positiveExamplePaths[i].c_str());
 
 		// EXPERIMENTAL: CROP IN CLOSER ON LFWA 
-		image.crop(39, 59, 189, 209);
+		//image.crop(39, 59, 189, 209);
 		image.resize(baseResolution, baseResolution);
-
 		auto inputBuf = cimgToHTMLImageData(image);
 		auto normalized = imageDataToNormalizedBuffer(inputBuf, baseResolution, baseResolution);
 		IntegralImage integral(normalized, baseResolution, baseResolution, size, false);
@@ -71,7 +70,7 @@ void computeAllIntegrals(
 		cimg_library::CImg<unsigned char> image(positiveValidationExamplePaths[i].c_str());
 
 		// EXPERIMENTAL: CROP IN CLOSER ON LFWA 
-		image.crop(39, 59, 189, 209);
+		//image.crop(39, 59, 189, 209);
 		image.resize(baseResolution, baseResolution);
 
 		auto inputBuf = cimgToHTMLImageData(image);
@@ -526,10 +525,17 @@ int main() {
 	// std::experimental::filesystem::path pathToValidationNegatives("/home/noah/Desktop/testsets/negatives-validation");
 	// std::experimental::filesystem::path pathToValidationPositives("/home/noah/Desktop/testsets/positives-validation");
 
-	std::experimental::filesystem::path pathToPositives("/home/noah/Desktop/datasets/lfwa"); // TODO: set via command line argument
+	// std::experimental::filesystem::path pathToPositives("/home/noah/Desktop/datasets/lfwa"); // TODO: set via command line argument
+	// std::experimental::filesystem::path pathToNegatives("/home/noah/Desktop/datasets/negatives"); //TODO: set via command line argument
+	// std::experimental::filesystem::path pathToValidationNegatives("/home/noah/Desktop/datasets/negative-validation");
+	// std::experimental::filesystem::path pathToValidationPositives("/home/noah/Desktop/datasets/lfwa-validation");
+
+	std::experimental::filesystem::path pathToPositives("/home/noah/Desktop/datasets/lfwcrop"); // TODO: set via command line argument
 	std::experimental::filesystem::path pathToNegatives("/home/noah/Desktop/datasets/negatives"); //TODO: set via command line argument
 	std::experimental::filesystem::path pathToValidationNegatives("/home/noah/Desktop/datasets/negative-validation");
-	std::experimental::filesystem::path pathToValidationPositives("/home/noah/Desktop/datasets/lfwa-validation");
+	std::experimental::filesystem::path pathToValidationPositives("/home/noah/Desktop/datasets/lfwcrop-validation");
+
+
 
 	int baseResolution = 24;
 

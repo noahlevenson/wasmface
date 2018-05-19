@@ -21,16 +21,9 @@ WeakClassifier::WeakClassifier() {
 }
 
 int WeakClassifier::classify(float featureValue) {
-	// std::cout << "type: " << this->haarlike.type << std::endl;
-	// std::cout << "w: " << this->haarlike.w << std::endl;
-	// std::cout << "h: " << this->haarlike.h << std::endl;
-	// std::cout << "x: " << this->haarlike.x << std::endl;
-	// std::cout << "y: " << this->haarlike.y << std::endl;
 	if (featureValue * float(this->polarity) < this->threshold * float(this->polarity)) {
 		return 1;
 	} else {
-		std::cout << "f: " << featureValue * float(this->polarity) << std::endl;
-		std::cout << "thresh: " << this->threshold * float(this->polarity) << std::endl;
 		return -1;
 	}
 }

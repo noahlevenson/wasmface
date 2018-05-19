@@ -15,6 +15,7 @@ CascadeClassifier::CascadeClassifier(int baseResolution, std::vector<StrongClass
 }
 
 void CascadeClassifier::scale(float factor) {
+	this->baseResolution *= factor;
 	for (int i = 0; i < this->strongClassifiers.size(); i += 1) {
 		this->strongClassifiers[i].scale(factor);
 	} 
@@ -28,10 +29,10 @@ void CascadeClassifier::removeLast() {
 	this->strongClassifiers.pop_back();
 }
 
-bool CascadeClassifier::classify(IntegralImage integral, int sx, int sy, float mean, float sd) {
+bool CascadeClassifier::classify(IntegralImage& integral, int sx, int sy, float mean, float sd) {
 	for (int i = 0; i < this->strongClassifiers.size(); i += 1) {
 		if (this->strongClassifiers[i].classify(integral, sx, sy, mean, sd) == false) {
-			std::cout << "cascade classifier's " << i << "th strong classifier classified false\n";
+			// std::cout << "cascade classifier's " << i << "th strong classifier classified false\n";
 			return false;
 		}
 	}
