@@ -14,7 +14,7 @@
 #include "../lib/CImg.h"
 #include "../lib/json.hpp"
 
-#include "wf-train-cascade.h"
+#include "wasmface-trainer.h"
 #include "utility.h"
 #include "integral-image.h"
 #include "weak-classifier.h"
