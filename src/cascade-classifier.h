@@ -5,9 +5,7 @@
 #include "integral-image.h"
 #include "strong-classifier.h"
 
-// Forward declarations
 class StrongClassifier;
-class CascadeTrainer;
 
 class CascadeClassifier {
 	public:

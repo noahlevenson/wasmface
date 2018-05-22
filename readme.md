@@ -17,7 +17,7 @@ You can also create your own models using [wasmface-trainer](https://github.com/
 
 Features:
 
-* Absolutely no GPU acceleration :stuck_out_tongue_winking_eye: Wasmface is an experiment in fast sequential processing
+* Absolutely no GPU acceleration :stuck_out_tongue_winking_eye: Wasmface is an experiment in sequential processing
 * Detection merging via non-maximum suppression
 * Variance normalization (pre-applied during training, post-applied during detection)
 * 5 types of Haar-like features
@@ -27,6 +27,10 @@ Features:
 <INSTRUCTIONS AND DOCS HERE>
 
 <DEPENDENCIES>
+
+<TODO>
+* Optimize everything, everywhere
+* Parameterize and improve the UX of wasmface-trainer 
 
 I developed Wasmface as part of my research at [Recurse Center](https://recurse.com), which focused on WebAssembly in the domain of computer vision.
 

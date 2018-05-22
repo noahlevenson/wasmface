@@ -1,13 +1,10 @@
 #include <vector>
 #include <cmath>
-#include <iostream>
 
 #include "integral-image.h"
 #include "utility.h"
 #include "haar-like.h"
 
-
-// Make normal
 IntegralImage::IntegralImage(float inputBuf[], int w, int h, int size, bool squared) {
 	this->data.resize(w, std::vector<float>(h, 0));
 	// Table to cache cumulative column values
@@ -53,12 +50,6 @@ float IntegralImage::getRectangleSum(int x, int y, int w, int h) {
 
 // TODO: Make this a switch statement
 // Compute the value of a Haar-like feature over this integral image
-// The 5 types correspond to the 5 types generated during training phase:
-// type 1: 2 rectangles horizontally
-// type 2: 3 rectangles horizontally
-// type 3: 2 rectangles vertically
-// type 4: 3 rectangles vertically
-// type 5: 4 rectangles in a 2x2 grid
 float IntegralImage::computeFeature(Haarlike& h, int sx, int sy) {
 	float wSum, bSum;
 	if (h.type == 1) {

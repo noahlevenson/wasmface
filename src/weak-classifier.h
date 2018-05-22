@@ -9,7 +9,6 @@ class WeakClassifier {
 		int classify(float featureValue);
 		void scale(float factor);
 		Haarlike haarlike;
-		float f;
 		bool label;
 		float weight;
 		float threshold;

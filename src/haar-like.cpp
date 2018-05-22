@@ -2,18 +2,16 @@
 
 #include "haar-like.h"
 
-// Constructor
-// TODO: does subwindow size ever get used?
+// TODO: I don't think subwindow size is ever used
 Haarlike::Haarlike(int s, int x, int y, int w, int h, int type) {
-	this->s = s; // Subwindow size
-	this->x = x; // X offset
-	this->y = y; // Y offset
-	this->w = w; // Width
-	this->h = h; // Height
-	this->type = type; // 1 - 5 : A - E
+	this->s = s; 
+	this->x = x; 
+	this->y = y; 
+	this->w = w; 
+	this->h = h; 
+	this->type = type; 
 }
 
-// Default constrctor - do we need this?
 Haarlike::Haarlike() {
 
 }

@@ -55,12 +55,11 @@ std::vector<std::array<int, 3>> nonMaxSuppression(std::vector<std::array<int, 3>
 	// for (int i = 0; i < ind.size(); i += 1) std::cout << ind[i] << ", ";
 	// 	std::cout << std::endl;
 
-	std::vector<int> pick;
-	std::vector<int> neighbors;
+	std::vector<std::pair<int, int>> pick;
 	while (ind.size() > 0) {
 		int last = ind.size() - 1;
 		int n = ind[last]; // This is selecting the bounding box that is lowest on screen?
-		pick.push_back(n);  // And we just select it and pick it as a keeper?
+		pick.push_back(std::pair<int, int> (n, 0));  // And we just select it and pick it as a keeper?
 		
 		std::vector<int> suppress = {last};
 
@@ -90,7 +89,7 @@ std::vector<std::array<int, 3>> nonMaxSuppression(std::vector<std::array<int, 3>
 		}
 
 		for (int i = 0; i < suppress.size(); i += 1) ind.erase(ind.begin() + suppress[i]);
-		neighbors.push_back(neighborsCount);
+		pick.back().second = neighborsCount;
 	}
 
 	delete [] x1;
@@ -102,7 +101,7 @@ std::vector<std::array<int, 3>> nonMaxSuppression(std::vector<std::array<int, 3>
 
 	std::vector<std::array<int, 3>> result;
 	for (int i = 0; i < pick.size(); i += 1) {
-		if (neighbors[i] > nthresh) result.push_back(boxes[pick[i]]);
+		if (pick[i].second > nthresh) result.push_back(boxes[pick[i].first]);
 	}
 	return result;
 } 
