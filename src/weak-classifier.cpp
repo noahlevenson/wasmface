@@ -3,7 +3,6 @@
 #include "weak-classifier.h"
 #include "haar-like.h"
 
-
 WeakClassifier::WeakClassifier(Haarlike haarlike, float f, bool label, float weight) {
 	this->haarlike = haarlike;
 	this->threshold = f;

@@ -122,10 +122,10 @@ unsigned char* cimgToHTMLImageData(cimg_library::CImg<unsigned char>& image) {
 				unsigned char b = image(j, i, 0, 2);
 				luma = rgbToLuma(r, g, b);
 			}
-			imageData[offset] = 0; 					// R
-			imageData[offset + 1] = 0;				// G
-			imageData[offset + 2] = 0;				// B
-			imageData[offset + 3] = 255 - luma;		// A - note inversion for HTML5 canvas
+			imageData[offset] = 0;				// R
+			imageData[offset + 1] = 0;			// G
+			imageData[offset + 2] = 0;			// B
+			imageData[offset + 3] = 255 - luma;	// A - note inversion for HTML5 canvas
 		}
 	}
 	return imageData;
@@ -250,8 +250,8 @@ StrongClassifier adaBoost(CascadeClassifier& cascadeClassifier, std::vector<Inte
 	// Initialize the weights
 	std::vector<float> posWeights(positiveSet.size());
 	std::vector<float> negWeights(negativeSet.size());
-	std::fill(posWeights.begin(), posWeights.end(), (float)1 / (float)2 * (float)positiveSet.size());
-	std::fill(negWeights.begin(), negWeights.end(), (float)1 / (float)2 * (float)negativeSet.size());
+	std::fill(posWeights.begin(), posWeights.end(), 1.0f / 2.0f * (float)positiveSet.size());
+	std::fill(negWeights.begin(), negWeights.end(), 1.0f / 2.0f * (float)negativeSet.size());
 
 	float lastOverallFPR;
 

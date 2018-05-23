@@ -1,5 +1,4 @@
 ### wasmface
-Fast WebAssembly face detection for HTML5 canvas
 
 Demo: http://wasmface.noahlevenson.com
 
@@ -13,7 +12,7 @@ For C++ developers: The Wasmface engine has zero dependencies and is written fro
 
 Wasmface comes with [human-face.js](https://github.com/noahlevenson/wasmface/src/models/human-face.js), a cascade classifier model trained to detect faces. It's a 20-layer cascade consisting of 300 features. The model was trained on ~13,000 positive examples from [LFW-a](https://www.openu.ac.il/home/hassner/data/lfwa/) and ~10,000 negative examples generated from stock photos.
 
-You can also create your own models using [wasmface-trainer](https://github.com/noahlevenson/wasmface/src/wasmface-trainer.cpp), a native executable tool which implements the training phase of the framework. Viola-Jones is particularly suited for detecting human faces, but TK TK.
+You can also create your own models using [wasmface-trainer](https://github.com/noahlevenson/wasmface/src/wasmface-trainer.cpp), a native executable tool that implements the training phase of the framework. Viola-Jones is particularly suited for detecting human faces, but TK TK.
 
 Features:
 
@@ -21,17 +20,40 @@ Features:
 * Detection merging via non-maximum suppression
 * Variance normalization (pre-applied during training, post-applied during detection)
 * 5 types of Haar-like features
-* Optimized for HTML5 pseudograyscale (luma in 4th byte)
+* Optimized for HTML5 ImageData pseudograyscale (luma in 4th byte)
 * Integral images, feature scaling, and everything else described in the 2001 paper
-
-<INSTRUCTIONS AND DOCS HERE>
-
-<DEPENDENCIES>
-
-<TODO>
-* Optimize everything, everywhere
-* Parameterize and improve the UX of wasmface-trainer 
 
 I developed Wasmface as part of my research at [Recurse Center](https://recurse.com), which focused on WebAssembly in the domain of computer vision.
 
-<CONTACT ETC>
+#### getting started
+This is all it takes to get up and running:
+```html
+<script src="wasmface.js"></script>
+<script src="wasmface-interface.js"></script>
+<script src="human-face.js"></script>
+
+<canvas id="canvas"></canvas>
+
+<script>
+	const canvas = document.getElementById("canvas");
+	const ctx = canvas.getContext("2d");
+
+	const wasmface = new Wasmface(humanFace);
+	const boundingBoxes = wasmface.detect(ctx);
+</script>
+```
+
+#### using wasmface
+
+#### using wasmface-trainer
+
+#### compiling from source
+
+#### dependencies
+
+#### todo
+* Many, many opportunities for optimization
+* Further parameterize and improve the UX of wasmface-trainer 
+
+#### contact
+I'd love to see how you're using Wasmface!

@@ -1,5 +1,4 @@
 #include <vector>
-#include <iostream>
 
 #include "cascade-classifier.h"
 #include "integral-image.h"
