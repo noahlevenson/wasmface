@@ -50,10 +50,8 @@ void StrongClassifier::optimizeThreshold(std::vector<IntegralImage>& positiveVal
 	std::sort(scores.begin(), scores.end());
 	int idx = maxFNR * positiveValidationSet.size();
 	float thresh = scores[idx];
-	while (idx > 0 && scores[idx] == thresh) {
-		idx -= 1;	
-	}
-
+	while (idx > 0 && scores[idx] == thresh) idx -= 1;	
+	
 	this->threshold = scores[idx]; 
 }
 

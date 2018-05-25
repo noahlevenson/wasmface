@@ -2,86 +2,84 @@
 
 <html>
 
-<head>
+	<head>
 
-	<title>wasmface demo</title>
+		<title>wasmface realtime demo</title>
 
-	<link rel="stylesheet" type="text/css" href="styles.css">
+		<link rel="stylesheet" type="text/css" href="styles.css">
 
-</head>
+	</head>
 
-<body>
+	<body>
 
-	<h1>are these faces?</h1>
+		<div id="input">
+		<!-- Here's our video element for use with the webcam stream -->
+		<video id="video" preload="auto" loop playsinline autoplay></video>
 
-	<img id="wildcard" src="media/jlo_crop.jpg">
-	<img id="jenniferlopez" src="media/Jennifer_Lopez_0003.jpg">
-	<img id="lancebass" src="media/Lance_Bass_0001.jpg">
-	<img id="noahlevenson" src="media/noah.jpg">
-	<img id="pikachu" src="media/pikachu_surprise.jpg">
-	<img id="robocop" src="media/robocop.jpg">
-	<img id="pizza" src="media/pizza.jpg">
-	<img id="richardstallman" src="media/Richard_Stallman.jpg">
+		<!-- Here's the output overlay canvas for visualizations of CV data -->
+		<canvas id="output-overlay-canvas"></canvas>
+		</div>
 
-	<div class="container">
-		<span class="copy">???</span>
-		<canvas class="canvas-24" id="wildcard-canvas"></canvas>
-		<span class="result" id="wildcard-result"></span>
-		<span>
-	</div>
+		<br>
 
-	<div class="container">
-		<span class="copy">Jennifer Lopez</span>
-		<canvas class="canvas-24" id="jenniferlopez-canvas"></canvas>
-		<span class="result" id="jenniferlopez-result"></span>
-		<span>
-	</div>
+		<!-- UI buttons and such -->
+		<button id="start" class="ui-button" onclick="start()">Start</button>
+		<button id="stop" class="ui-button" onclick="stop()">Stop</button>
 
-	<div class="container">
-		<span class="copy">Lance Bass</span>
-		<canvas class="canvas-24" id="lancebass-canvas"></canvas>
-		<span class="result" id="lancebass-result"></span>
-	</div>
+		<br>
 
-	<div class="container">
-		<span class="copy">Noah Levenson</span>
-		<canvas class="canvas-24" id="noahlevenson-canvas"></canvas>
-		<span class="result" id="noahlevenson-result"></span>
-	</div>
+		<div class="panel">
 
-	<div class="container">
-		<span class="copy">Pikachu</span>
-		<canvas class="canvas-24" id="pikachu-canvas"></canvas>
-		<span class="result" id="pikachu-result"></span>
-	</div>
+			<p class="stack">detection</p>
+				
+				<span class="ui-text">feature scale step:</span>
+				<span class="param-text" id="scale-step-output">2.0</span>
+			
+			<div class="slider">
+				<input type="range" min="2.0" max="20.0" value="2.0" step="0.1" class="slider" id="scale-step">
+			</div>
 
-	<div class="container">
-		<span class="copy">Robocop</span>
-		<canvas class="canvas-24" id="robocop-canvas"></canvas>
-		<span class="result" id=robocop-result></span>
-	</div>
+				<span class="ui-text">sweep delta:</span>
+				<span class="param-text" id="delta-output">2.0</span>
 
-	<div class="container">
-		<span class="copy">Pizza</span>
-		<canvas class="canvas-24" id="pizza-canvas"></canvas>
-		<span class="result" id=pizza-result></span>
-	</div>
+			<div class="slider">
+				<input type="range" min="1.0" max="20.0" value="2.0" step="0.1" class="slider" id="delta">
+			</div>
 
-	<div class="container">
-		<span class="copy">Richard Stallman</span>
-		<canvas class="canvas-24" id="richardstallman-canvas"></canvas>
-		<span class="result" id="richardstallman-result"></span>
-	</div>
+		</div>
 
-	<br> 
+		<div class="panel">
 
-	<button type="button" id="detect" onclick="go()">detect!</button>
+			<p class="stack">post processing</p>
 
-	<script src="wasmface.js"></script>
+			<span class="ui-text">overlap threshold:</span>
+				<span class="param-text" id="overlap-output">0.3</span>
+			
+			<div class="slider">
+				<input type="range" min="0" max="1" value="0.3" step="0.1" class="slider" id="overlap">
+			</div>
 
-	<script src="demo.js"></script>
+				<span class="ui-text">neighbor threshold:</span>
+				<span class="param-text" id="neighbor-output">5</span>
 
-</body>
+			<div class="slider">
+				<input type="range" min="0" max="50" value="5" step="1" class="slider" id="neighbor">
+			</div>
 
+		</div>
+
+		<!-- Here's our input canvas, which is used as an intermediary between our video and our wasm functions-->
+		<canvas id="input-canvas"></canvas>
+
+		<!-- Include the wasm js glue code -->
+		<script src="wasmface.js"></script>
+
+		<!-- Include the js wrappers -->
+		<!-- <script src="wasmface-wrap.min.js"></script> -->
+
+		<!-- Include the js file that controls the behavior of this page -->
+		<script src="demo.js"></script>
+
+	</body>
 
 </html>

@@ -1,45 +1,68 @@
 body, html {
-	font-family: 'Arial', 'Helvetica', sans-serif;
+	font-family: 'arial', 'helvetica', sans-serif;
 }
 
-img {
+#input {
+	width: 650px;
+	height: 490px;
+	display: inline-block;
+}
+
+#video {
+	width: 640;
+	height: 480px;
+	border-width: 5px;
+	border-color: #000;
+	border-style: solid;
+	position: absolute;
+	z-index: 10;
+}
+
+#output-overlay-canvas {
+	width: 640px;
+	height: 480px;
+	border-width: 5px;
+	border-color: #ffff00;
+	border-color: #000;
+	border-style: solid;
+	position: absolute;
+	z-index: 20;
+}
+
+#input-canvas {
+	width: 640px;
+	height: 480px;
 	display: none;
 }
 
-button {
-	margin: 10px;
-}
-
-h1 {
-	font-family: 'Arial', 'Helvetica', sans-serif;
-	margin-left: 10px;
-}
-
-.container {
-	width: 300px;
-	border-width: 3px;
-	border-color: #000;
-	border-style: solid;
-	padding: 5px;
-	text-align: center;
+.panel {
+	width: 400px;
 	display: inline-block;
-	margin: 5px;
+	vertical-align: top;
 }
 
-.result {
-	font-family: 'Arial', 'Helvetica', sans-serif;
-	color: #ff0000;
+
+.stack {
+	margin-left: 20px;
+	margin-bottom: 30px;
+	font-size: 16px;
 	font-weight: bolder;
 }
 
-.canvas-24 {
-	width: 240px;
-	height: 240px;
-	border-width: 3px;
-	border-color: #000;
-	z-index: 10;
-	margin-left: auto;
-	margin-right: auto;
-	display: block;
-	margin-bottom: 4px;
+.slider {
+	padding: 10px;
+	margin-left: 20px;
+}
+
+.ui-text {
+	margin-left: 30px;
+}
+
+.param-text {
+	color: #cc0066;
+	font-weight: bolder;
+}
+
+.ui-button {
+	margin: 10px;
 }

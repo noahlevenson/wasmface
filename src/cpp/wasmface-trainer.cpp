@@ -468,7 +468,7 @@ int main(int argc, char* argv[]) {
 		int size = cascadeClassifier.baseResolution * cascadeClassifier.baseResolution * 4;
 		int stepSize = 1;
 		for (int i = 0; i < negativeExamplePaths.size() && negativeSet.size() < negativeSetSize; i += 1) {
-			std::cout << "Rebuilding negative training set! Checking image " << i << "/" << negativeExamplePaths.size() << " for suitable subwindows...\n";
+			std::cout << "Rebuilding negative training set! Checking image " << i + 1 << "/" << negativeExamplePaths.size() << " for suitable subwindows...\n";
 			cimg_library::CImg<unsigned char> image(negativeExamplePaths[i].c_str());
 			for (int h = 0; h < image.height() - cascadeClassifier.baseResolution && negativeSet.size() < negativeSetSize; h += stepSize) {
 				for (int w = 0; w < image.width() - cascadeClassifier.baseResolution && negativeSet.size() < negativeSetSize; w += stepSize) {
