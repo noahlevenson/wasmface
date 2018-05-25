@@ -1,37 +1,26 @@
 <!DOCTYPE html>
 
 <html>
-
 	<head>
-
 		<title>wasmface realtime demo</title>
-
 		<link rel="stylesheet" type="text/css" href="styles.css">
-
 	</head>
 
 	<body>
-
 		<div id="input">
-		<!-- Here's our video element for use with the webcam stream -->
-		<video id="video" preload="auto" loop playsinline autoplay></video>
-
-		<!-- Here's the output overlay canvas for visualizations of CV data -->
-		<canvas id="output-overlay-canvas"></canvas>
+			<video id="video" preload="auto" loop playsinline autoplay></video>
+			<canvas id="output-overlay-canvas"></canvas>
 		</div>
 
 		<br>
 
-		<!-- UI buttons and such -->
 		<button id="start" class="ui-button" onclick="start()">Start</button>
 		<button id="stop" class="ui-button" onclick="stop()">Stop</button>
 
 		<br>
 
 		<div class="panel">
-
 			<p class="stack">detection</p>
-				
 				<span class="ui-text">feature scale step:</span>
 				<span class="param-text" id="scale-step-output">2.0</span>
 			
@@ -45,14 +34,11 @@
 			<div class="slider">
 				<input type="range" min="1.0" max="20.0" value="2.0" step="0.1" class="slider" id="delta">
 			</div>
-
 		</div>
 
 		<div class="panel">
-
 			<p class="stack">post processing</p>
-
-			<span class="ui-text">overlap threshold:</span>
+				<span class="ui-text">overlap threshold:</span>
 				<span class="param-text" id="overlap-output">0.3</span>
 			
 			<div class="slider">
@@ -66,20 +52,14 @@
 				<input type="range" min="0" max="50" value="5" step="1" class="slider" id="neighbor">
 			</div>
 
+			<input id="applypp" type="checkbox" class="ck" checked="true" name="aplypp">
+			<label for="aplypp">apply</label>
 		</div>
 
-		<!-- Here's our input canvas, which is used as an intermediary between our video and our wasm functions-->
 		<canvas id="input-canvas"></canvas>
-
-		<!-- Include the wasm js glue code -->
 		<script src="wasmface.js"></script>
-
 		<!-- Include the js wrappers -->
 		<!-- <script src="wasmface-wrap.min.js"></script> -->
-
-		<!-- Include the js file that controls the behavior of this page -->
 		<script src="demo.js"></script>
-
 	</body>
-
 </html>

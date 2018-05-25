@@ -77,7 +77,7 @@ A directory containing negatie validation images in jpg or ppm format. All subdi
 #### compiling from source
 wasmface
 ```bash
-emcc wasmface.cpp cascade-classifier.cpp haar-like.cpp integral-image.cpp strong-classifier.cpp utility.cpp weak-classifier.cpp -s TOTAL_MEMORY=1024MB -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap']" -s WASM=1 -O3 -std=c++1z -o wasmface.js
+emcc wasmface.cpp cascade-classifier.cpp haar-like.cpp integral-image.cpp strong-classifier.cpp utility.cpp weak-classifier.cpp -s TOTAL_MEMORY=1024MB -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap', 'allocate']" -s WASM=1 -O3 -std=c++1z -o wasmface.js
 ```
 wasmface-trainer
 ```bash

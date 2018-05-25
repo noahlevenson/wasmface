@@ -41,7 +41,6 @@ body, html {
 	vertical-align: top;
 }
 
-
 .stack {
 	margin-left: 20px;
 	margin-bottom: 30px;
@@ -56,6 +55,11 @@ body, html {
 
 .ui-text {
 	margin-left: 30px;
+}
+
+.ck {
+	margin-left: 30px;
+	margin-top: -10px;
 }
 
 .param-text {

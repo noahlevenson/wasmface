@@ -133,9 +133,10 @@ EMSCRIPTEN_KEEPALIVE CascadeClassifier* create(char model[]) {
 	return cc;
 }
 
-EMSCRIPTEN_KEEPALIVE int detect(unsigned char inputBuf[], int w, int h, CascadeClassifier* cco, 
-							    float step, float delta, float othresh, int nthresh) {
+EMSCRIPTEN_KEEPALIVE uint16_t* detect(unsigned char inputBuf[], int w, int h, CascadeClassifier* cco, 
+							    float step, float delta, bool pp, float othresh, int nthresh) {
 	CascadeClassifier* cc = new CascadeClassifier(*cco);
+	
 	int byteSize = w * h * 4;
 	auto fpgs = toGrayscaleFloat(inputBuf, w, h);
 	auto integral = IntegralImage(fpgs, w, h, byteSize, false);
@@ -143,7 +144,6 @@ EMSCRIPTEN_KEEPALIVE int detect(unsigned char inputBuf[], int w, int h, CascadeC
 	delete [] fpgs;
 
 	std::vector<std::array<int, 3>> roi;
-
 	while (cc->baseResolution < w && cc->baseResolution < h) {
 		for (int y = 0; y < h - cc->baseResolution; y += step * delta) {
 			for (int x = 0; x < w - cc->baseResolution; x += step * delta) {
@@ -163,30 +163,23 @@ EMSCRIPTEN_KEEPALIVE int detect(unsigned char inputBuf[], int w, int h, CascadeC
 		cc->scale(step);
 	}
 
-	// for (int i = 0; i < roi.size(); i += 1) {
-	// 	EM_ASM({
-	// 		outputOverlayCtx.strokeStyle = '#ff0000';
-	// 		outputOverlayCtx.lineWidth = 6;
-	// 		outputOverlayCtx.beginPath();
-	// 		outputOverlayCtx.rect($0, $1, $2, $2); 
-	// 		outputOverlayCtx.stroke();
-	// 	},roi[i][0], roi[i][1], roi[i][2]);
-	// }
+	if (pp) roi = nonMaxSuppression(roi, othresh, nthresh);
 
-	auto boxes = nonMaxSuppression(roi, othresh, nthresh);
+	int blen = roi.size() * 3 + 1;
+	uint16_t* boxes = new uint16_t[blen];
+	boxes[0] = blen;
+	for (int i = 0, j = 1; i < roi.size(); i += 1, j += 3) {
+		boxes[j] = roi[i][0];
+		boxes[j + 1] = roi[i][1];
+		boxes[j + 2] = roi[i][2];
 
-	for (int i = 0; i < boxes.size(); i += 1) {
-		EM_ASM({
-			outputOverlayCtx.strokeStyle = '#77ff33';
-			outputOverlayCtx.lineWidth = 4;
-			outputOverlayCtx.beginPath();
-			outputOverlayCtx.rect($0, $1, $2, $2); 
-			outputOverlayCtx.stroke();
-		}, boxes[i][0], boxes[i][1], boxes[i][2]);
+		// std::cout << boxes[i + 1] << std::endl;
+		// std::cout << boxes[i + 2] << std::endl;
+		// std::cout << boxes[i + 3] << std::endl;
 	}
-
+	
 	delete cc;
-	return 1;
+	return boxes;
 }
 
 int main() {
