@@ -1,9 +1,3 @@
-// g++ wasmface-trainer.cpp utility.cpp integral-image.cpp haar-like.cpp weak-classifier.cpp strong-classifier.cpp cascade-classifier.cpp -O3 -L/usr/X11R6/lib -lm -lpthread -lX11 -std=c++17 "-lstdc++fs" -o ../bin/wasmface-trainer
-
-// g++ -g wasmface-trainer.cpp utility.cpp integral-image.cpp haar-like.cpp weak-classifier.cpp strong-classifier.cpp cascade-classifier.cpp -O0 -L/usr/X11R6/lib -lm -lpthread -lX11 -std=c++17 "-lstdc++fs" -o ../bin/wasmface-trainer
-
-// wasmface-trainer --b 24 --s 10000 --p /home/noah/Desktop/datasets/lfwcrop --n /home/noah/Desktop/datasets/negatives --vp /home/noah/Desktop/datasets/lfwcrop-validation --vn /home/noah/Desktop/datasets/negative-validation
-
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -21,7 +15,11 @@
 #include "weak-classifier.h"
 #include "strong-classifier.h"
 
-// Recursively scan a local directory for compatible image files and store their paths
+/**
+ * Recursively scan a local directory for image files and store their paths
+ * @param {std::experimental::filesystem::path} path        Initial path to local directory
+ * @param {std::vector<std::string>}            destination Where to accumulate found image paths
+ */
 void getImagePaths(const std::experimental::filesystem::path& path, std::vector<std::string>& destination) {
 	if (std::experimental::filesystem::is_directory(path)) {
 		for (auto& childPath: std::experimental::filesystem::directory_iterator(path)) {
@@ -35,9 +33,13 @@ void getImagePaths(const std::experimental::filesystem::path& path, std::vector<
 	}
 }
 
-// Compute normalized integral images for an arbitrary number of local image files
-// Assumes all local images are square aspect ratio and will resize them to baseResolution
-// Takes a vector of filesystem paths, returns a vector of integral images
+/**
+ * Compute variance normalized integral images for a set of local images
+ * Assumes local images are 1:1 aspect ratio and any pixel dimensions
+ * @param  {std::vector<std::string>}   paths          A set of paths to local image files
+ * @param  {Int}                        baseResolution Images will be resized to baseResolution x baseResolution pixels before computation
+ * @return {std::vector<IntegralImage>}                A set of integral images
+ */
 std::vector<IntegralImage> computeIntegrals(std::vector<std::string>& paths, int baseResolution) {
 	int size = baseResolution * baseResolution * 4;
 	std::vector<IntegralImage> finalIntegrals;
@@ -55,9 +57,14 @@ std::vector<IntegralImage> computeIntegrals(std::vector<std::string>& paths, int
 	return finalIntegrals;
 }
 
-// Compute normalized integral images created from randomized subwindows of an arbitrary number of local image files
-// Assumes all local image files are larger than baseResolution and of arbitrary aspect ratio
-// Takes a vector of filesystem paths, returns a vector of integral images
+/**
+ * Compute variance normalized integral images generated from randomized subwindows of a set of local images
+ * Assumes local images are any aspect ratio and of pixel dimensions > baseResolution
+ * @param  {std::vector<std::string>}   paths          A set of paths to local image files
+ * @param  {Int}                        baseResolution Subwindows will be baseResolution x baseResolution pixels
+ * @param  {Int}                        setSize        Number of integral images to generate
+ * @return {std::vector<IntegralImage>}                A set of integral images
+ */
 std::vector<IntegralImage> computeIntegralsRand(std::vector<std::string>& paths, int baseResolution, int setSize) {
 	int size = baseResolution * baseResolution * 4;
 	std::vector<IntegralImage> finalIntegrals;
@@ -80,9 +87,13 @@ std::vector<IntegralImage> computeIntegralsRand(std::vector<std::string>& paths,
 	return finalIntegrals;
 }
 
-// Compute normalized integral images created from every non-overlapping subwindow of an arbitrary number of local image files
-// Assumes all local image files are larger than baseResolution and of arbitrary aspect ratio
-// Takes a vector of filesystem paths, returns a vector of integral images
+/**
+ * Compute variance normalized integral images generated from every non-overlapping subwindow of a set of local images
+ * Assumes local images are any aspect ratio and of pixel dimensions > baseResolution
+ * @param  {std::vector<std::string>}   paths          A set of paths to local image files
+ * @param                               baseResolution Subwindows will be baseResolution x baseResolution pixels
+ * @return {std::vector<IntegralImage>}                A set of integral images       
+ */
 std::vector<IntegralImage> computeIntegralsGrid(std::vector<std::string>& paths, int baseResolution) {
 	int size = baseResolution * baseResolution * 4;
 	std::vector<IntegralImage> finalIntegrals;
@@ -105,9 +116,12 @@ std::vector<IntegralImage> computeIntegralsGrid(std::vector<std::string>& paths,
 	return finalIntegrals;
 }
 
-// Convert CImg image format to an HTML imagedata-style 1D buffer of bytes
-// Assumes the input image is formatted in RGB or grayscale colorspace
-// Returns a pointer to an image buffer in pseudogreyscale format (luma in 4th byte)
+/**
+ * Convert a CImg object to an HTML5 ImageData pseudograyscale buffer (discard RGB and store luma in 4th byte)
+ * Assumes the color space of the input object is RGB or grayscale
+ * @param  {cimg_library::CImg<unsigned char>} image The CImg object
+ * @return {unsigned char*}                          Pointer to a new buffer
+ */
 unsigned char* cimgToHTMLImageData(cimg_library::CImg<unsigned char>& image) {
 	unsigned char* imageData = new unsigned char[image.width() * image.height() * 4];
 	for (int i = 0; i < image.height(); i += 1) {
@@ -122,41 +136,43 @@ unsigned char* cimgToHTMLImageData(cimg_library::CImg<unsigned char>& image) {
 				unsigned char b = image(j, i, 0, 2);
 				luma = rgbToLuma(r, g, b);
 			}
-			imageData[offset] = 0;				// R
-			imageData[offset + 1] = 0;			// G
-			imageData[offset + 2] = 0;			// B
-			imageData[offset + 3] = 255 - luma;	// A - note inversion for HTML5 canvas
+			imageData[offset] = 0;              // R
+			imageData[offset + 1] = 0;          // G
+			imageData[offset + 2] = 0;          // B
+			imageData[offset + 3] = 255 - luma; // A - note inversion for HTML5 canvas
 		}
 	}
 	return imageData;
 }
 
-// Generate a complete set of ~160,000 Haar-like features
-// Generates all possible scales and positions for feature types 1, 2, 3, 4 & 5 as constrained by the subwindow size 
-// Takes a subwindow size and returns a vector of Haarlikes
+/**
+ * Generate a complete set of Haar-like features (types 1, 2, 3, 4 & 5) as constrained by a given window
+ * @param  {Int}                   s The window size
+ * @return {std::vector<Haarlike>}   A set of Haar-like features
+ */
 std::vector<Haarlike> generateFeatures(int s) {
 	std::vector<Haarlike> featureSet;
 	for (int i = 0; i < s; i += 1) {
 		for (int j = 0; j < s; j += 1) {
 			for (int h = 1; i + h <= s; h += 1) {
 				for (int w = 1; w * 2 + j <= s; w += 1) {
-					featureSet.push_back(Haarlike(s, j, i, w, h, 1));
+					featureSet.push_back(Haarlike(j, i, w, h, 1));
 				}
 				for (int w = 1; w * 3 + j <= s; w += 1) {
-					featureSet.push_back(Haarlike(s, j, i, w, h, 2));
+					featureSet.push_back(Haarlike(j, i, w, h, 2));
 				}
 			}
 			for (int h = 1; i + h * 2 <= s; h += 1) {
 				for (int w = 1; j + w <= s; w += 1) {
-					featureSet.push_back(Haarlike(s, j, i, w, h, 3));
+					featureSet.push_back(Haarlike(j, i, w, h, 3));
 				}
 				for (int w = 1; j + w * 2 <= s; w += 1) {
-					featureSet.push_back(Haarlike(s, j, i, w, h, 5));
+					featureSet.push_back(Haarlike(j, i, w, h, 5));
 				}
 			}
 			for (int h = 1; i + h * 3 <= s; h += 1) {
 				for (int w = 1; j + w <= s; w += 1) {
-					featureSet.push_back(Haarlike(s, j, i, w, h, 4));
+					featureSet.push_back(Haarlike(j, i, w, h, 4));
 				}
 			}	
 		}
@@ -164,8 +180,13 @@ std::vector<Haarlike> generateFeatures(int s) {
 	return featureSet;
 }
 
-// Serialize a cascade classifier object and format it as JSON
-// Takes a cascade classifier object and returns a string
+/**
+ * Serialize a cascade classifier object
+ * @param  {CascadeClassifier} cascadeClassifier The cascade classifier to serialize
+ * @param  {Float}             fpr               Arbitrary false positive rate to include
+ * @param  {Float}             fnr               Arbitrary false negative rate to include
+ * @return {std::string}                         A stringified JSON object
+ */
 std::string cascadeToJSON(CascadeClassifier& cascadeClassifier, float fpr, float fnr) {
 	nlohmann::json ccJSON;
 	ccJSON["strongClassifiers"] = nlohmann::json::array();
@@ -194,8 +215,13 @@ std::string cascadeToJSON(CascadeClassifier& cascadeClassifier, float fpr, float
 	return ccJSON.dump();
 }
 
-// Find and set optimal threshold and polarity for a given feature type by evaluating its error rate
-// Takes a vector of weak classifiers and positive and negative weights and returns a weak classifier 
+/**
+ * Evaluate a set of potential weak classifiers and select the threshold and polarity that minimizes classification error
+ * @param  {std::vector<WeakClassifier>} potentialWCs A set of potential weak classifiers 
+ * @param  {std::vector<float>}          posWeights   A set of positive weights as specified by AdaBoost
+ * @param  {std::vector<float>}          negWeights   A set of negative weights as specified by AdaBoost
+ * @return WeakClassifier                             The optimal weak classifier
+ */
 WeakClassifier optimizeWC(std::vector<WeakClassifier> potentialWCs, std::vector<float> posWeights, std::vector<float> negWeights) {
 	std::sort(potentialWCs.begin(), potentialWCs.end(), comparePotentialWeakClassifiers);
 	
@@ -239,12 +265,24 @@ WeakClassifier optimizeWC(std::vector<WeakClassifier> potentialWCs, std::vector<
 	return potentialWCs[bestWC];
 }
 
-// Modified AdaBoost learning algorithm
-// Returns a strong classifier
+/**
+ * Modified version of the AdaBoost learning algorithm
+ * Builds a strong classifier from a weighted combination of the best weak classifiers
+ * @param  {CascadeClassifier}          cascadeClassifier     The cascade classifier being trained
+ * @param  {std::vector<IntegralImage>} positiveSet           A set of positive training images
+ * @param  {std::vector<IntegralImage>} negativeSet           A set of negative training images
+ * @param  {std::vector<IntegralImage>} positiveValidationSet A set of positive validation images
+ * @param  {std::vector<IntegralImage>} negativeValidationSet A set of negative validation images
+ * @param  {std::vector<Haarlike>}      featureSet            A set of Haar-like features
+ * @param  {Float}                      targetMaxFPR          Normalized target max false positive rate
+ * @param  {Float}                      targetMaxFNR          Normalized target max false negative rate
+ * @param  {Int}                        maxFeatures           Maximum features for the strong classifier
+ * @return {StrongClassifier}                                 A strong classifier
+ */
 StrongClassifier adaBoost(CascadeClassifier& cascadeClassifier, std::vector<IntegralImage>& positiveSet, 
-						  std::vector<IntegralImage>& negativeSet, std::vector<IntegralImage>& positiveValidationSet, 
-						  std::vector<IntegralImage>& negativeValidationSet, std::vector<Haarlike>& featureSet,
-						  float targetMaxFPR, float targetMaxFNR, int maxFeatures) {
+                          std::vector<IntegralImage>& negativeSet, std::vector<IntegralImage>& positiveValidationSet, 
+                          std::vector<IntegralImage>& negativeValidationSet, std::vector<Haarlike>& featureSet,
+                          float targetMaxFPR, float targetMaxFNR, int maxFeatures) {
 	StrongClassifier strongClassifier;
 	
 	// Initialize the weights
@@ -261,8 +299,7 @@ StrongClassifier adaBoost(CascadeClassifier& cascadeClassifier, std::vector<Inte
 	float currentOverallFPR = lastOverallFPR;
 	float currentOverallFNR = 0;  
 
-	while (currentOverallFPR > targetMaxFPR * lastOverallFPR && 
-		   strongClassifier.weakClassifiers.size() < maxFeatures) {
+	while (currentOverallFPR > targetMaxFPR * lastOverallFPR && strongClassifier.weakClassifiers.size() < maxFeatures) {
 		std::cout << "\nSelecting new WC! Our current FPR is " << currentOverallFPR <<
 			" and we'll stop adding WCs when we hit an FPR of " << targetMaxFPR * lastOverallFPR << std::endl;
 
@@ -321,7 +358,7 @@ StrongClassifier adaBoost(CascadeClassifier& cascadeClassifier, std::vector<Inte
 
 		float alpha = std::log(1.0f / beta);
 		strongClassifier.add(bestWC, alpha);
-		strongClassifier.optimizeThreshold(positiveValidationSet, cascadeClassifier, targetMaxFNR);
+		strongClassifier.optimizeThreshold(positiveValidationSet, targetMaxFNR);
 		cascadeClassifier.add(strongClassifier);
 		currentOverallFPR = cascadeClassifier.getFPR(negativeValidationSet);
 		currentOverallFNR = cascadeClassifier.getFNR(positiveValidationSet);
@@ -333,12 +370,16 @@ StrongClassifier adaBoost(CascadeClassifier& cascadeClassifier, std::vector<Inte
 	return strongClassifier;
 }
 
+/**
+ * Main function
+ * By default we create a 30 layer cascade with sensible targets for FPR and max features per layer
+ * TODO: parameterize number of layers, target max FPR for the cascade, target max FNR per layer,
+ * [target FPR per layer], [max features per layer], output director for model and model filename
+ * @param  {Int}   argc
+ * @param  {Char*} argv
+ * @return {Int}
+ */
 int main(int argc, char* argv[]) {
-	// By default we create a 30 layer cascade with some sensible targets for FPR and max features per layer
-	// TODO: Parameterize the following from the command line:
-	// number of layers, target max FPR for the cascade, target max FNR per layer, [target FPR per layer],
-	// [max features per layer], output directory for models & model filename
-
 	if (argc < 13) {
 		std::cout << "\nError: not enough parameters!\n";
 		return 0;
@@ -355,10 +396,10 @@ int main(int argc, char* argv[]) {
 	for (int i = 2; i < targetFPRs.size(); i += 1) targetFPRs[i] = 0.615425314f;
 
 	std::vector<int> featuresPerLayer = { 
-										5, 10, 30, 50, 50, 50, 100, 100, 100, 200,
-										200, 200, 200, 200, 200, 200, 200, 200, 200, 200,
-										200, 200, 200, 200, 200, 200, 200, 200, 200, 200 
-										};
+                                        5, 10, 30, 50, 50, 50, 100, 100, 100, 200,
+                                        200, 200, 200, 200, 200, 200, 200, 200, 200, 200,
+                                        200, 200, 200, 200, 200, 200, 200, 200, 200, 200 
+                                        };
 
 	std::experimental::filesystem::path pathToPositives;
 	std::experimental::filesystem::path pathToNegatives;

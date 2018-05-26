@@ -3,7 +3,11 @@
 
 #include "utility.h"
 
-// Convert an offset into an HTML imagedata object to a 2D vector
+/**
+ * Convert an HTML5 ImageData offset to a 2D vector
+ * @param {Int} offset The offset
+ * @param {Int} w      Width of the ImageData object
+ */
 std::vector<int> offsetToVec2(int offset, int w) {
 	std::vector<int> vec2(2);
 	int pixelOffset = offset / 4;
@@ -12,14 +16,25 @@ std::vector<int> offsetToVec2(int offset, int w) {
 	return vec2;
 }
 
-// Convert a set of RGB values to grayscale luma
+/**
+ * Convert RGB to luma
+ * @param  {Unsigned char} r Red value
+ * @param  {Unsigned char} g Green value
+ * @param  {Unsigned char} b Blue value
+ * @return {Unsigned char}   Luma value
+ */
 unsigned char rgbToLuma(unsigned char r, unsigned char g, unsigned char b) {
 	unsigned char luma = r * 0.2126 + g * 0.7152 + b * 0.0722;
 	return luma;
 }
 
-// Convert an HTML imagedata format buffer in-place to pseudograyscale
-// color space (discard/ignore RGB and store luma in 4th byte)
+/**
+ * Convert an HTML5 ImageData buffer in-place to pseudograyscale format (discard RGB and store luma in 4th byte)
+ * @param  {Unsigned char*} inputBuf Pointer to an ImageData buffer
+ * @param  {Int}            w        Width of ImageData object
+ * @param  {Int}            h        Height of ImageData object
+ * @return {Unsigned char*}          Pointer to the original buffer
+ */
 unsigned char* toGrayscale(unsigned char inputBuf[], int w, int h) {
 	int size = w * h * 4;
 	for (int i = 0; i < size; i += 4) {
@@ -32,8 +47,13 @@ unsigned char* toGrayscale(unsigned char inputBuf[], int w, int h) {
 	return inputBuf;
 }
 
-// TODO: I don't like that this and imageDataToNormalizedBuffer return objects on the heap
-// that must be memory managed - consider turning both into classes with useful destructors?
+/**
+ * Convert an HTML5 ImageData buffer to floating point pseudograyscale format (discard RGB and store luma in 4th float)
+ * @param  {Unsigned char*} inputBuf Pointer to an ImageData buffer
+ * @param  {Int}            w        Width of ImageData object
+ * @param  {Int}            h        Height of ImageData object
+ * @return {Unsigned char*}          Pointer to a new buffer
+ */
 float* toGrayscaleFloat(unsigned char inputBuf[], int w, int h) {
 	int size = w * h * 4;
 	float* gs = new float[size];
@@ -50,20 +70,27 @@ float* toGrayscaleFloat(unsigned char inputBuf[], int w, int h) {
 	return gs;
 }
 
-// TODO: Rename this function "normalizeImageData()"
-// Convert an HTML imagedata format buffer to a buffer of normalized floating point values
+/**
+ * Apply variance normalization to a pseudograyscale HTML5 ImageData buffer 
+ * @param  {Unsigned char*} inputBuf Pointer to an ImageData buffer
+ * @param  {Int}            w        Width of ImageData object
+ * @param  {Int}            h        Height of ImageData object
+ * @return {Float*}                  Pointer to a new buffer
+ */
 float* imageDataToNormalizedBuffer(unsigned char inputBuf[], int w, int h) {
 	int byteSize = w * h * 4;
 	int size = w * h;
+	
 	int sum = 0;
 	for (int i = 3; i < byteSize; i += 4) sum += inputBuf[i];
-	float mean = float(sum) / float(size);
+
 	float sd = 0;
+	float mean = float(sum) / float(size);
 	for (int i = 3; i < byteSize; i += 4) sd += std::pow(float(inputBuf[i]) - mean, 2);
 	sd /= size;
 	sd = std::sqrt(sd);
 	if (sd == 0) sd = 1;
-	// TODO: Should we collapse this (and all floating point intermediate representations) to 1 dimension?
+
 	float* normalizedBuf = new float[byteSize];
 	for (int i = 3; i < byteSize; i += 4) normalizedBuf[i] = (float(inputBuf[i]) - mean) / sd;
 	return normalizedBuf;

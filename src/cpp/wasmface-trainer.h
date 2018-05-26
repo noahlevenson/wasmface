@@ -21,6 +21,6 @@ std::vector<Haarlike> generateFeatures(int s);
 std::string cascadeToJSON(CascadeClassifier& cascadeClassifier, float fpr, float fnr);
 WeakClassifier optimizeWC(std::vector<WeakClassifier> potentialWCs, std::vector<float> posWeights, std::vector<float> negWeights);
 StrongClassifier adaBoost(CascadeClassifier& cascadeClassifier, std::vector<IntegralImage>& positiveSet, 
-						  std::vector<IntegralImage>& negativeSet, std::vector<IntegralImage>& positiveValidationSet, 
-						  std::vector<IntegralImage>& negativeValidationSet, std::vector<Haarlike>& featureSet,
-						  float targetMaxFPR, float targetMaxFNR, int maxFeatures);
+                          std::vector<IntegralImage>& negativeSet, std::vector<IntegralImage>& positiveValidationSet, 
+                          std::vector<IntegralImage>& negativeValidationSet, std::vector<Haarlike>& featureSet,
+                          float targetMaxFPR, float targetMaxFNR, int maxFeatures);

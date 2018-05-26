@@ -1,7 +1,3 @@
-// source ./emsdk_env.sh --build=Release
-
-// emcc wasmface.cpp cascade-classifier.cpp haar-like.cpp integral-image.cpp strong-classifier.cpp utility.cpp weak-classifier.cpp -s TOTAL_MEMORY=1024MB -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap', 'allocate']" -s WASM=1 -O3 -std=c++1z -o ../../demo/wasmface.js
-
 #include <iostream>
 #include <vector>
 #include <array>
@@ -21,15 +17,29 @@
 extern "C" {
 #endif
 
+/**
+ * Compare two pointers based on their dereferenced values
+ * @param  {Int*} a First pointer
+ * @param  {Int*} b Second pointer
+ * @return {Bool}   True if the first pointer's dereferenced value is the smaller of the two
+ */
 bool compareDereferencedPtrs(int* a, int* b) {
 	return *a < *b;
 }
 
+/**
+ * Apply non-maximum suppression to a set of 1:1 aspect ratio bounding boxes
+ * Bounding boxes are represented as [x, y, s] where s = width and height
+ * @param  {std::vector<std::array<int, 3>>} boxes   The set of bounding boxes
+ * @param  {Float}                           thresh  The minimum overlap ratio required for suppression
+ * @param  {Float}                           nthresh The minimum number of neighboring boxes required for suppression
+ * @return {std::vector<std::array<int, 3>>}         The suppressed set of bounding boxes
+ */
 std::vector<std::array<int, 3>> nonMaxSuppression(std::vector<std::array<int, 3>>& boxes, float thresh, int nthresh) {
 	int len = boxes.size();
 	if (!len) return boxes;
 
-	// Destructure our bounding boxes into arrays of coords and calculate areas
+	// Destructure our bounding boxes into arrays representing upper left and lower right coords
 	int* x1 = new int[len];
 	int* y1 = new int[len];
 	int* x2 = new int[len];
@@ -43,40 +53,28 @@ std::vector<std::array<int, 3>> nonMaxSuppression(std::vector<std::array<int, 3>
 		area[i] = std::pow(boxes[i][2], 2);
 	}
 
-	// To create an array of the indexes that would sort our y2 coords:
-	// Create an array of pointers to our y2 coords, sort by the value they
-	// point to, then subtract the pointer to the start of the y2 coords array from each pointer
+	// Create an array of the indices that would sort our y2 coords
 	int** ptrs = new int*[len];
 	for (int i = 0; i < len; i += 1) ptrs[i] = &y2[i];
 	std::sort(ptrs, ptrs + len, compareDereferencedPtrs);
 	std::vector<int> ind(len);
 	for (int i = 0; i < len; i += 1) ind[i] = ptrs[i] - &y2[0];
 
-	// for (int i = 0; i < ind.size(); i += 1) std::cout << ind[i] << ", ";
-	// 	std::cout << std::endl;
-
 	std::vector<std::pair<int, int>> pick;
 	while (ind.size() > 0) {
 		int last = ind.size() - 1;
-		int n = ind[last]; // This is selecting the bounding box that is lowest on screen?
-		pick.push_back(std::pair<int, int> (n, 0));  // And we just select it and pick it as a keeper?
+		int n = ind[last]; 
+		pick.push_back(std::pair<int, int> (n, 0));  
 		
-		std::vector<int> suppress = {last};
-
+		// Suppress bounding boxes that overlap 
 		int neighborsCount = 0;
-
+		std::vector<int> suppress = {last};
 		for (int i = 0; i < last; i += 1) {
 			int j = ind[i];
-
-			// What's bigger, the upper left corner of the lowest on-screen box, or the upper left
-			// corner of the box we're currently evaluating?
 			int xx1 = std::max(x1[n], x1[j]);
 			int yy1 = std::max(y1[n], y1[j]);
-			// What's smaller, the lower right corner of the lowest on-screen box, or the lower right
-			// corner of the box we're currently evaluating?
 			int xx2 = std::min(x2[n], x2[j]);
 			int yy2 = std::min(y2[n], y2[j]);
-
 			int w = std::max(0, xx2 - xx1 + 1);
 			int h = std::max(0, yy2 - yy1 + 1);
 
@@ -99,14 +97,19 @@ std::vector<std::array<int, 3>> nonMaxSuppression(std::vector<std::array<int, 3>
 	delete [] area;
 	delete [] ptrs;
 
+	// Also suppress boxes that do not have the minimum number of neighbors
 	std::vector<std::array<int, 3>> result;
 	for (int i = 0; i < pick.size(); i += 1) {
-		if (pick[i].second > nthresh) result.push_back(boxes[pick[i].first]);
+		if (pick[i].second >= nthresh) result.push_back(boxes[pick[i].first]);
 	}
 	return result;
 } 
 
-// TODO: implement a destructor
+/**
+ * Deserialize and construct a cascade classifier object
+ * @param  {Char*}              model A serialized cascade classifier object
+ * @return {CascadeClassifier*}       A pointer to a new cascade classifier object
+ */
 EMSCRIPTEN_KEEPALIVE CascadeClassifier* create(char model[]) {
 	auto ccJSON = nlohmann::json::parse(model);
 
@@ -133,8 +136,30 @@ EMSCRIPTEN_KEEPALIVE CascadeClassifier* create(char model[]) {
 	return cc;
 }
 
+/**
+ * Destroy a cascade classifier object
+ * Provided as a JavaScript-callable function
+ * @param {CascadeClassifier*} cc Pointer to the cascade classifier to destroy
+ */
+EMSCRIPTEN_KEEPALIVE void destroy(CascadeClassifier* cc) {
+	delete cc;
+}
+
+/**
+ * Use a cascade classifier to detect objects in an HTML5 ImageData buffer
+ * @param  {Unsigned char*}     inputBuf Pointer to an HTML5 ImageData buffer
+ * @param  {Int}                w        Width of the ImageData object
+ * @param  {Int}                h        Height of the ImageData object
+ * @param  {CascadeClassifier*} cco      Pointer to a cascade classifier object
+ * @param  {Float}              step     Detector scale step to apply
+ * @param  {Float}              delta    Detector sweep delta to apply
+ * @param  {Bool}               pp       True applies post processing
+ * @param  {Float}              othresh  Overlap threshold for post processing
+ * @param  {Float}              nthresh  Neighbor threshold for post processing
+ * @return {uint16_t*}                   Pointer to an array of bounding box geometry
+ */
 EMSCRIPTEN_KEEPALIVE uint16_t* detect(unsigned char inputBuf[], int w, int h, CascadeClassifier* cco, 
-							    float step, float delta, bool pp, float othresh, int nthresh) {
+                                      float step, float delta, bool pp, float othresh, int nthresh) {
 	CascadeClassifier* cc = new CascadeClassifier(*cco);
 	
 	int byteSize = w * h * 4;
@@ -143,6 +168,7 @@ EMSCRIPTEN_KEEPALIVE uint16_t* detect(unsigned char inputBuf[], int w, int h, Ca
 	auto integralSquared = IntegralImage(fpgs, w, h, byteSize, true);
 	delete [] fpgs;
 
+	// Sweep and scale the detector over the post-normalized input image and collect detections
 	std::vector<std::array<int, 3>> roi;
 	while (cc->baseResolution < w && cc->baseResolution < h) {
 		for (int y = 0; y < h - cc->baseResolution; y += step * delta) {
@@ -165,6 +191,7 @@ EMSCRIPTEN_KEEPALIVE uint16_t* detect(unsigned char inputBuf[], int w, int h, Ca
 
 	if (pp) roi = nonMaxSuppression(roi, othresh, nthresh);
 
+	// We return a 1D array on the heap with its length stashed as the first element
 	int blen = roi.size() * 3 + 1;
 	uint16_t* boxes = new uint16_t[blen];
 	boxes[0] = blen;
@@ -172,16 +199,16 @@ EMSCRIPTEN_KEEPALIVE uint16_t* detect(unsigned char inputBuf[], int w, int h, Ca
 		boxes[j] = roi[i][0];
 		boxes[j + 1] = roi[i][1];
 		boxes[j + 2] = roi[i][2];
-
-		// std::cout << boxes[i + 1] << std::endl;
-		// std::cout << boxes[i + 2] << std::endl;
-		// std::cout << boxes[i + 3] << std::endl;
 	}
 	
 	delete cc;
 	return boxes;
 }
 
+/**
+ * Main function
+ * @return {Int}
+ */
 int main() {
 	std::cout << "Made with Wasmface\n";
 	return 0;

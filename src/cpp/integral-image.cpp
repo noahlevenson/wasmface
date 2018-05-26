@@ -5,27 +5,36 @@
 #include "utility.h"
 #include "haar-like.h"
 
+/**
+ * Constructor
+ * @param {Float*} inputBuf Pointer to a buffer of input values in floating point ImageData pseudograyscale format
+ * @param {Int}    w        Width of source image
+ * @param {Int}    h        Height of source image
+ * @param {Int}    size     Length of input buffer
+ * @param {Bool}   squared  True produces an integral image derived from squared input values
+ */
 IntegralImage::IntegralImage(float inputBuf[], int w, int h, int size, bool squared) {
 	this->data.resize(w, std::vector<float>(h, 0));
-	// Table to cache cumulative column values
 	std::vector<float> sumTable(size);
 	for (int i = 3; i < size; i += 4) {
 		auto vec2 = offsetToVec2(i - 3, w);
 		int x = vec2[0];
 		int y = vec2[1];
-		// Value of our integral image at (x,y) equals
-		// the accumulated sum of the previous pixels in the column above it 
-		// plus the accumulated sum of the previous pixels to the left
-		float yP = y - 1 < 0 ? 0 : sumTable[i - w * 4]; // northern neighbor
-		float xP = x - 1 < 0 ? 0 : this->data[x - 1][y]; // left hand neighbor
+		float yP = y - 1 < 0 ? 0 : sumTable[i - w * 4];
+		float xP = x - 1 < 0 ? 0 : this->data[x - 1][y];
 		sumTable[i] = !squared ? yP + inputBuf[i] : yP + std::pow(inputBuf[i], 2);
 		this->data[x][y] = xP + sumTable[i];	
 	}
 }
 
-// TODO: Make this a switch statement
-// Compute the sum of pixels within a rectangle of arbitrary size over this integral image 
-// Rectangle corners are enumerated clockwise from top left: a, b, c, d
+/**
+ * Compute the sum of values within a rectangular region of an integral image
+ * @param  {Int} x X offset for upper left corner
+ * @param  {Int} y Y offset for upper left corner
+ * @param  {Int} w Width of rectangle
+ * @param  {Int} h Height of rectangle
+ * @return {Float} Sum
+ */
 float IntegralImage::getRectangleSum(int x, int y, int w, int h) {
 	float sum;
 	if (x != 0 && y != 0) {
@@ -48,8 +57,13 @@ float IntegralImage::getRectangleSum(int x, int y, int w, int h) {
 	return sum;
 }
 
-// TODO: Make this a switch statement
-// Compute the value of a Haar-like feature over this integral image
+/**
+ * Compute the value of a Haar-like feature over an integral image
+ * @param  {Haarlike} h  The Haar-like feature to compute
+ * @param  {Int}      sx Integral image x offset
+ * @param  {Int}      sy Integral image y offset
+ * @return {Float}       Feature value
+ */
 float IntegralImage::computeFeature(Haarlike& h, int sx, int sy) {
 	float wSum, bSum;
 	if (h.type == 1) {

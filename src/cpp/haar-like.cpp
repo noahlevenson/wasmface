@@ -2,9 +2,15 @@
 
 #include "haar-like.h"
 
-// TODO: I don't think subwindow size is ever used
-Haarlike::Haarlike(int s, int x, int y, int w, int h, int type) {
-	this->s = s; 
+/**
+ * Constructor
+ * @param {Int} x    X offset relative to subwindow
+ * @param {Int} y    Y offset relative to subwindow
+ * @param {Int} w    Constituent rectangle width
+ * @param {Int} h    Constituent rectangle height
+ * @param {Int} type Feature type 1-5 
+ */
+Haarlike::Haarlike(int x, int y, int w, int h, int type) {
 	this->x = x; 
 	this->y = y; 
 	this->w = w; 
@@ -12,10 +18,17 @@ Haarlike::Haarlike(int s, int x, int y, int w, int h, int type) {
 	this->type = type; 
 }
 
+/**
+ * Constructor
+ */
 Haarlike::Haarlike() {
 
 }
 
+/**
+ * Destructively scale a Haarlike relative to its base resolution
+ * @param {Float} factor The factor by which to scale
+ */
 void Haarlike::scale(float factor) {
 	this->w *= factor;
 	this->h *= factor;

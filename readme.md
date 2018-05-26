@@ -93,6 +93,7 @@ ImageMagick
 
 #### todo
 - [ ] Overall optimization
+- [ ] Improve and optimize post processing / non-maximum suppression
 - [ ] Parameterize wasmface-trainer for layer count, max features and target FPR
 - [ ] Sanitization of wasmface-trainer arguments
 - [ ] Train an improved human face classifier
