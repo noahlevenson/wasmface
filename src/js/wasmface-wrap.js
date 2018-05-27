@@ -31,11 +31,11 @@ Wasmface.prototype.detect = function(ctx, pp = 1, othresh = 0.3, nthresh = 10, s
 	Module.HEAPU8.set(inputImgData.data, inputBuf);
 
 	const ptr = Module.ccall("detect", "number", 
-						   	 ["number", "number", "number", "number", "number", "number", "number", "number", "number"], 
-						  	 [inputBuf, ctx.canvas.width, ctx.canvas.height, this.ptr, step, delta, pp, othresh, nthresh])
-							 / Uint16Array.BYTES_PER_ELEMENT;
+                             ["number", "number", "number", "number", "number", "number", "number", "number", "number"], 
+                             [inputBuf, ctx.canvas.width, ctx.canvas.height, this.ptr, step, delta, pp, othresh, nthresh])
+	                         / Uint16Array.BYTES_PER_ELEMENT;
 
-	len = Module.HEAPU16[ptr];
+	const len = Module.HEAPU16[ptr];
 	const boxes = [];
 	for (let i = 1; i < len; i += 3) {
 		const box = [Module.HEAPU16[ptr + i], Module.HEAPU16[ptr + i + 1], Module.HEAPU16[ptr + i + 2]];

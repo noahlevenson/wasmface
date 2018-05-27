@@ -27,7 +27,7 @@ Features:
 
 I developed Wasmface as part of my research at [Recurse Center](https://recurse.com), which focused on WebAssembly in the domain of computer vision.
 
-#### getting started
+#### :rocket: getting started
 Here's how to get Wasmface up and running:
 ```html
 <script src="wasmface.js"></script> // Glue code that loads the .wasm module
@@ -45,7 +45,7 @@ Here's how to get Wasmface up and running:
 </script>
 ```
 
-#### using wasmface
+#### :smiley: using wasmface
 The Wasmface JavaScript interface was designed with simplicity in mind. Instantiate a new Wasmface object by passing the constructor a JSON Wasmface cascade classifier model:
 
 ```javascript
@@ -54,7 +54,7 @@ const myWasmface = new Wasmface(humanFace);
 
 ##### **Methods**
 
-###### detect(ctx, [pp, othresh, nthresh, step, delta])
+##### detect(ctx, [pp, othresh, nthresh, step, delta])
 
 Use a cascade classifier model to detect objects in a canvas element.
 
@@ -70,11 +70,11 @@ Use a cascade classifier model to detect objects in a canvas element.
 
 `delta` Detector sweep delta size.
 
-###### destroy()
+##### destroy()
 
 Manually deallocate the heap memory associated with a cascade classifier. 
 
-#### using wasmface-trainer
+#### :boom: using wasmface-trainer
 ```
 wasmface-trainer --b 24 --s 10000 --p /path/to/positives --n /path/to/negatives --pv /path/to/validation/positives --pn /path/to/validation/negatives
 ```
@@ -103,7 +103,7 @@ A directory containing positive validation images in .jpg or .ppm format. Any su
 
 A directory containing negatie validation images in .jpg or .ppm format. Any subdirectories will be recursively scanned for images. Images are assumed to be larger than the specified base resolution and of arbitrary aspect ratio.
 
-#### compiling from source
+#### :floppy_disk: compiling from source
 **wasmface**
 ```
 emcc wasmface.cpp cascade-classifier.cpp haar-like.cpp integral-image.cpp strong-classifier.cpp utility.cpp weak-classifier.cpp -s TOTAL_MEMORY=1024MB -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap', 'allocate']" -s WASM=1 -O3 -std=c++1z -o wasmface.js
@@ -112,19 +112,19 @@ emcc wasmface.cpp cascade-classifier.cpp haar-like.cpp integral-image.cpp strong
 ```
 g++ wasmface-trainer.cpp utility.cpp integral-image.cpp haar-like.cpp weak-classifier.cpp strong-classifier.cpp cascade-classifier.cpp -O3 -lpthread -std=c++17 "-lstdc++fs" -o wasmface-trainer
 ```
-#### dependencies
+#### :books: dependencies
 [JSON for Modern C++](https://github.com/nlohmann/json): Used to construct JSON objects during model serialization and deserialization.
 
 [CImg](https://github.com/dtschump/CImg): Used during training for loading and manipulating local image files. CImg depends on [ImageMagick](https://github.com/ImageMagick/ImageMagick) to decode .jpg and .ppm files.
 
-#### todo
+#### :memo: todo
 - [ ] Overall optimization
 - [ ] Parameterize wasmface-trainer for layer count, max features and target FPR
 - [ ] Sanitization of wasmface-trainer arguments
 - [ ] Implement pause and resume for wasmface-trainer
 - [ ] Train a vastly improved human face classifier
 
-#### contact
+#### :pager: contact
 [twitter.com/noahlevenson](https://twitter.com/noahlevenson)
 
 noahlevenson [at] gmail [dot] com
