@@ -24,7 +24,7 @@ std::vector<int> offsetToVec2(int offset, int w) {
  * @return {Unsigned char}   Luma value
  */
 unsigned char rgbToLuma(unsigned char r, unsigned char g, unsigned char b) {
-	unsigned char luma = r * 0.2126 + g * 0.7152 + b * 0.0722;
+	unsigned char luma = r * 0.2126f + g * 0.7152f + b * 0.0722f;
 	return luma;
 }
 
@@ -38,7 +38,7 @@ unsigned char rgbToLuma(unsigned char r, unsigned char g, unsigned char b) {
 unsigned char* toGrayscale(unsigned char inputBuf[], int w, int h) {
 	int size = w * h * 4;
 	for (int i = 0; i < size; i += 4) {
-		int luma = inputBuf[i] * 0.2126 + inputBuf[i + 1] * 0.7152 + inputBuf[i + 2] * 0.0722;
+		int luma = inputBuf[i] * 0.2126f + inputBuf[i + 1] * 0.7152f + inputBuf[i + 2] * 0.0722f;
 		inputBuf[i] = 0;
 		inputBuf[i + 1] = 0;
 		inputBuf[i + 2] = 0;

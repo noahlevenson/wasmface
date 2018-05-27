@@ -39,17 +39,17 @@ void StrongClassifier::add(WeakClassifier weakClassifier, float weight) {
  * @param  {Int}            sx       Subwindow x offset
  * @param  {Int}            sy       Subwindow y offset
  * @param  {Float}          mean     The mean of the values within the subwindow (for post-normalization)
- * @param  {Float}			sd       The standard deviation for the values within the subwindow (for post normalization)
+ * @param  {Float}          sd       The standard deviation for the values within the subwindow (for post normalization)
  * @return {Bool}                    True for positive detection, false for negative
  */
 bool StrongClassifier::classify(IntegralImage& integral, int sx, int sy, float mean, float sd) {
 	float score = 0;
 	for (int i = 0; i < this->weakClassifiers.size(); i += 1) {
-		auto f = integral.computeFeature(this->weakClassifiers[i].haarlike, sx, sy);
+		float f = integral.computeFeature(this->weakClassifiers[i].haarlike, sx, sy);
 		if (this->weakClassifiers[i].haarlike.type == 2) {
-			f += float(this->weakClassifiers[i].haarlike.w * 3) * float(this->weakClassifiers[i].haarlike.h) * mean / 3.0f;
+			f += (this->weakClassifiers[i].haarlike.w * 3 * this->weakClassifiers[i].haarlike.h * mean) / 3;
 		} else if (this->weakClassifiers[i].haarlike.type == 4) {
-			f += float(this->weakClassifiers[i].haarlike.w) * float(this->weakClassifiers[i].haarlike.h  * 3) * mean / 3.0f;
+			f += (this->weakClassifiers[i].haarlike.w * this->weakClassifiers[i].haarlike.h * 3 * mean) / 3;
 		}
 		if (sd != 0) f /= sd;
 		score += this->weakClassifiers[i].classify(f) * this->weights[i];
@@ -69,7 +69,7 @@ void StrongClassifier::optimizeThreshold(std::vector<IntegralImage>& positiveVal
 	for (int i = 0; i < positiveValidationSet.size(); i += 1) {
 		for (int j = 0; j < this->weakClassifiers.size(); j += 1) {
 			auto f = positiveValidationSet[i].computeFeature(this->weakClassifiers[j].haarlike, 0, 0);
-			scores[i] += float(this->weakClassifiers[j].classify(f)) * float(this->weights[j]);
+			scores[i] += this->weakClassifiers[j].classify(f) * this->weights[j];
 		}
 	}
 
@@ -91,7 +91,7 @@ float StrongClassifier::getFPR(std::vector<IntegralImage>& negativeValidationSet
 	for (int i = 0; i < negativeValidationSet.size(); i += 1) {
 		if (this->classify(negativeValidationSet[i], 0, 0, 0, 1) == true) falsePositives += 1;
 	}
-	return (float)falsePositives / (float)negativeValidationSet.size();  
+	return (float)falsePositives / negativeValidationSet.size();  
 }
 
 /**
@@ -104,5 +104,5 @@ float StrongClassifier::getFNR(std::vector<IntegralImage>& positiveValidationSet
 	for (int i = 0; i < positiveValidationSet.size(); i += 1) {
 		if (this->classify(positiveValidationSet[i], 0, 0, 0, 1) == false) falseNegatives += 1;
 	}
-	return (float)falseNegatives / (float)positiveValidationSet.size();
+	return (float)falseNegatives / positiveValidationSet.size();
 }

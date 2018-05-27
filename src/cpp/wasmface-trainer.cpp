@@ -6,8 +6,8 @@
 #include <experimental/random>
 #include <fstream>
 
-#include "../lib/CImg.h"
-#include "../lib/json.hpp"
+#include "../../lib/CImg.h"
+#include "../../lib/json.hpp"
 
 #include "wasmface-trainer.h"
 #include "utility.h"
@@ -288,8 +288,8 @@ StrongClassifier adaBoost(CascadeClassifier& cascadeClassifier, std::vector<Inte
 	// Initialize the weights
 	std::vector<float> posWeights(positiveSet.size());
 	std::vector<float> negWeights(negativeSet.size());
-	std::fill(posWeights.begin(), posWeights.end(), 1.0f / 2.0f * (float)positiveSet.size());
-	std::fill(negWeights.begin(), negWeights.end(), 1.0f / 2.0f * (float)negativeSet.size());
+	std::fill(posWeights.begin(), posWeights.end(), 1.0f / 2.0f * positiveSet.size());
+	std::fill(negWeights.begin(), negWeights.end(), 1.0f / 2.0f * negativeSet.size());
 
 	float lastOverallFPR;
 
@@ -395,10 +395,10 @@ int main(int argc, char* argv[]) {
 	targetFPRs[1] = 0.25f;
 	for (int i = 2; i < targetFPRs.size(); i += 1) targetFPRs[i] = 0.615425314f;
 
-	std::vector<int> featuresPerLayer = { 
-                                        5, 10, 30, 50, 50, 50, 100, 100, 100, 200,
-                                        200, 200, 200, 200, 200, 200, 200, 200, 200, 200,
-                                        200, 200, 200, 200, 200, 200, 200, 200, 200, 200 
+	std::vector<int> featuresPerLayer = {
+                                         5, 10, 30, 50, 50, 50, 100, 100, 100, 200,
+                                         200, 200, 200, 200, 200, 200, 200, 200, 200, 200,
+                                         200, 200, 200, 200, 200, 200, 200, 200, 200, 200 
                                         };
 
 	std::experimental::filesystem::path pathToPositives;
@@ -484,7 +484,7 @@ int main(int argc, char* argv[]) {
 		currentOverallFNR = cascadeClassifier.getFNR(positiveValidationSet);
 
 		std::ofstream modelFile;
-		std::string filename = "../models/my-model-" + std::to_string(i + 1) + "-layers.js";
+		std::string filename = "../../models/my-model-" + std::to_string(i + 1) + "-layers.js";
 		modelFile.open(filename, std::ios_base::trunc);
 		std::string json = cascadeToJSON(cascadeClassifier, currentOverallFPR, currentOverallFNR);
 		modelFile << "const wasmfaceModel = " << json;

@@ -4,7 +4,7 @@
 #include <string>
 #include <experimental/filesystem>
 
-#include "../lib/CImg.h"
+#include "../../lib/CImg.h"
 
 #include "haar-like.h"
 #include "integral-image.h"

@@ -72,7 +72,7 @@ float CascadeClassifier::getFPR(std::vector<IntegralImage>& negativeValidationSe
 	for (int i = 0; i < negativeValidationSet.size(); i += 1) {
 		if (this->classify(negativeValidationSet[i], 0, 0, 0, 1) == true) falsePositives += 1;
 	}
-	return (float)falsePositives / (float)negativeValidationSet.size();
+	return (float)falsePositives / negativeValidationSet.size();
 }
 
 /**
@@ -85,5 +85,5 @@ float CascadeClassifier::getFNR(std::vector<IntegralImage>& positiveValidationSe
 	for (int i = 0; i < positiveValidationSet.size(); i += 1) {
 		if (this->classify(positiveValidationSet[i], 0, 0, 0, 1) == false) falseNegatives += 1;
 	}
-	return (float)falseNegatives / (float)positiveValidationSet.size();
+	return (float)falseNegatives / positiveValidationSet.size();
 }
