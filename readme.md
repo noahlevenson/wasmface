@@ -30,9 +30,9 @@ I developed Wasmface as part of my research at [Recurse Center](https://recurse.
 #### :rocket: getting started
 Here's how to get Wasmface up and running:
 ```html
-<script src="wasmface.js"></script> // Glue code that loads the .wasm module
-<script src="wasmface-wrap.min.js"></script> // JS wrappers
-<script src="human-face.js"></script> // Cascade classifier model for detecting faces
+<script src="wasmface.js"></script> <!-- Glue code that loads the .wasm module -->
+<script src="wasmface-wrap.min.js"></script> <!-- JS wrappers -->
+<script src="human-face.js"></script> <!-- Cascade classifier model for detecting faces -->
 
 <canvas id="canvas"></canvas>
 
